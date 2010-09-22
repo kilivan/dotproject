@@ -1,0 +1,5 @@
+- jQuery library is required: http://jquery.com/
+- Activity module tested with jQuery v1.4.2
+
+Activity module is an time tracking module for dotProject.
+It provides an interface for projects contributors to capture their activities and for projects owners the possibility to monitor the captured activities.
