@@ -84,7 +84,11 @@ $ttl = $project_id > 0 ? "Edit Project" : "New Project";
 $titleBlock = new CTitleBlock($ttl, 'applet3-48.png', $m, "$m.$a");
 $titleBlock->addCrumb("?m=projects", "projects list");
 if ($project_id != 0)
-$titleBlock->addCrumb("?m=projects&a=view&project_id=$project_id", "view this project");
+{
+	$titleBlock->addCrumb("?m=projects&a=view&project_id=$project_id", "view this project");
+	//GT
+	$titleBlock->addCrumb("?m=projects&a=edit_tasks&project_id=$project_id", "organize tasks");
+}
 $titleBlock->show();
 
 //Build display list for departments

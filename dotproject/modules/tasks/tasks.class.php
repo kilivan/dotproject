@@ -2531,7 +2531,9 @@ function showtask(&$a, $level=0, $is_opened = true, $today_view = false, $hideOp
 	echo $s;
 }
 
-function findchild(&$tarr, $parent, $level=0) {
+//GT new param $toModify for tasks modification (EV 276)
+//GT new param $toOrganize for tasks modification (EV 275)
+function findchild(&$tarr, $parent, $level=0, $toModify = false, $toOrganize = false) {
 	global $tasks_opened, $tasks_closed, $tasks_filtered, $children_of;
 	$tasks_closed = (($tasks_closed) ? $tasks_closed : array());
 	$tasks_opened = (($tasks_opened) ? $tasks_opened : array());
@@ -2545,7 +2547,15 @@ function findchild(&$tarr, $parent, $level=0) {
 			//check for child
 			$no_children = empty($children_of[$task['task_id']]);
 			
-			showtask($task, $level, $is_opened, false, $no_children);
+			if($toModify)
+			{
+				showtaskToModify($task, $level, $is_opened, false, $no_children, false);
+			} else if($toOrganize) {
+				showtaskToOrganize($task, $level, $is_opened, false, $no_children, false);
+			} 
+			else {
+				showtask($task, $level, $is_opened, false, $no_children, false);
+			}
 			if ($is_opened && !($no_children)) {
 				/*
 				 * Yes, this is stupid, but there was previously a bug where if you had
@@ -2557,10 +2567,65 @@ function findchild(&$tarr, $parent, $level=0) {
 				 * reference.  I suspect it's a PHP4 vs PHP5 oddity.
 				 */
 				$tmp = $tarr;
-				findchild($tmp, $task['task_id'], $level);
+				findchild($tmp, $task['task_id'], $level, $toModify, $toOrganize);
 			}
 		}
 	}
+}
+function showtaskToModify(&$a, $level=0, $is_opened = true, $today_view = false, $hideOpenCloseLink=false, $allowRepeat = false){}
+//This kludgy function echos children tasks as threads
+function showtaskToOrganize(&$a, $level=0, $is_opened = true, $today_view = false, $hideOpenCloseLink=false, $allowRepeat = false) {
+
+	global $AppUI, $user_id, $task_id;
+
+	if ($task_id)
+	{
+		$s .=  '<div id='.$a['task_id'].' class="ui-state-default">';
+		$s .= '<span class="ui-icon ui-icon-arrowthick-2-n-s"></span>';
+		$s .= '<a href="./index.php?m=tasks&a=view&task_id='.$a['task_id'].'">' . $a['task_name'] . '</a>';
+		$s .= '<div align="right">';
+		$sdate = new CDate($a['task_start_date']);
+		$edate = new CDate($a['task_end_date']);
+		$s .= '       ';
+		$s .= $sdate->format('%d/%m/%Y');
+		$s .= ' - ';
+		$s .= $edate->format('%d/%m/%Y');
+		$s .= '</div>';
+		$s .= '</div>';
+	} else {
+
+		if ($level==0){
+			$taskid = $a['task_id'];
+			$s .= '</div>';
+			$s .=  '<div id='.$taskid.' class="ui-state-default">';
+			$s .= '<span class="ui-icon ui-icon-arrowthick-2-n-s"></span>';
+
+		} else {
+			$s .= '<div>';
+		}
+		
+		for ($y=0; $y < $level; $y++) {  
+			$s .= ('<img src="' . (($y+1 == $level) ? './images/corner-dots.gif' : './images/shim.gif') 
+				. '" width="16" height="12" border="0">');
+		}
+		if ($level==0){
+			$s .= '<a href="./index.php?m=tasks&a=view&task_id='.$taskid.'">' . $a['task_name'] . '</a>';
+			$s .= '<div align="right">';
+			$sdate = new CDate($a['task_start_date']);
+			$edate = new CDate($a['task_end_date']);
+			$s .= '       ';
+			$s .= $sdate->format('%d/%m/%Y');
+			$s .= ' - ';
+			$s .= $edate->format('%d/%m/%Y');
+			$s .= '</div>';
+		} else {
+			$s .= $a['task_name'];
+			$s .= '</div>';
+		}
+	
+	}
+	
+	echo $s;
 }
 
 /*
