@@ -24,6 +24,47 @@ function bestColor($bg, $lt='#ffffff', $dk='#000000') {
 	         || $b < $x && $g < $x) ? $lt  : $dk);
 }
 
+function arraySelectWithDisabled(&$arr, $select_name, $select_attribs, $selected, $translate=false, $arrToDisabled) {
+   GLOBAL $AppUI;
+   if (! is_array($arr)) {
+       dprint(__FILE__, __LINE__, 0, 'arraySelect called with no array');
+       return '';
+   }
+   reset($arr);
+   $s = ("\n" . '<select name="' . $select_name . '" ' . $select_attribs . '>');
+   $did_selected = 0;
+   $firstLoop = true;
+   foreach ($arr as $k => $v) {
+       if ($translate) {
+           $v = @$AppUI->_($v);
+           // This is supplied to allow some Hungarian characters to
+           // be translated correctly. There are probably others.
+           // As such a more general approach probably based upon an
+           // array lookup for replacements would be a better approach. AJD.
+           $v=str_replace('&#369;','�',$v);
+          $v=str_replace('&#337;','�',$v);
+       }
+       if (array_key_exists($k, $arrToDisabled))
+       {
+           if(!$firstLoop)
+           {
+               $s .= ("\n\t" . '</optgroup>');
+           }
+           $firstLoop = false;
+           $s .= ("\n\t" . '<optgroup label="' . $arrToDisabled[$k] . '">');
+       }
+       $s .= ("\n\t" . '<option value="' . $k . '"'
+               . (($k == $selected && !$did_selected) ? ' selected="selected"' : '') . ">"
+              . $v . '</option>');
+       if ($k == $selected) {
+           $did_selected = 1;
+       }
+   }
+   $s .= ("\n\t" . '</optgroup>');
+   $s .= "\n</select>\n";
+   return $s;
+}
+
 ##
 ## returns a select box based on an key,value array where selected is based on key
 ##
