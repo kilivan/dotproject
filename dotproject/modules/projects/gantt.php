@@ -166,6 +166,9 @@ if ($start_date && $end_date) {
 	$d_start = new CDate();
 	$d_end = new CDate();
 	for ($i = 0, $xi = count(@$projects); $i < $xi; $i++) {
+		//GT [BugFix]
+		$p = $projects[$i];
+		//GT
 		$start = mb_substr($p['project_start_date'], 0, 10);
 		$end = mb_substr($p['project_end_date'], 0, 10);
 		
